@@ -66,12 +66,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
 
-    //Kotlin
-    //implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
-
-    //Permission State
-    //implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
-
     //Gson
     implementation("com.google.code.gson:gson:2.8.9")
     //Coil
