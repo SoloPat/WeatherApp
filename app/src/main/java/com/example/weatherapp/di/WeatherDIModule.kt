@@ -3,7 +3,6 @@ package com.example.weatherapp.di
 import com.example.weatherapp.data.datasource.WeatherDatasource
 import com.example.weatherapp.data.datasource.WeatherService
 import com.example.weatherapp.data.repository.WeatherRepository
-import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,22 +30,15 @@ class WeatherDIModule {
         }.build()
     }
 
-    @Provides
-    @Singleton
-    fun provideGsonConverterFactory(): GsonConverterFactory {
-        val gson = GsonBuilder().create()
-        return GsonConverterFactory.create(gson)
-    }
 
     @Provides
     @Singleton
     fun provideNetworkService(
-        gsonConverterFactory: GsonConverterFactory,
         okHttpClient: OkHttpClient
     ): WeatherService {
         return Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/")
-            .addConverterFactory(gsonConverterFactory)
+            .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
             .create(WeatherService::class.java)
