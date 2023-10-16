@@ -54,12 +54,11 @@ fun getUserLocationNonComp(context: Context, callb:(latLon:LatandLong)->Unit) {
             LocationRequest.Builder(60000)
                 .setMaxUpdateDelayMillis(60000)
                 .setIntervalMillis(50000)
-                .setDurationMillis(10)
+                .setDurationMillis(50)
                 .setPriority(Priority.PRIORITY_LOW_POWER)
                 .setMaxUpdates(1)
-                .setGranularity(Granularity.GRANULARITY_COARSE)
+                .setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
                 .build()
-        //use FusedLocationProviderClient to request location update
         locationProvider.requestLocationUpdates(
             locationRequest,
             it,

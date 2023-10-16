@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -91,12 +90,12 @@ fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
 
     PermiChecker(permissionsState,
         grantedContent = {
-            //Text(text = "Permission Granted")
+            Text(text = "Permission Granted")
             getUserLocationNonComp(LocalContext.current) {
                 weatherViewModel.getWeatherByCurrentLocation(lat = it.latitude, lon = it.longitude)
             } },
         notGrantedContent = {
-            //Text(text = "Permission Not Granted Last Location ${dataStore.lastLocationFlow}")
+            Text(text = "Permission Not Granted Last Location ${dataStore.lastLocationFlow}")
             weatherViewModel.getWeather(city = lastSearch.value)
                             },
         notAvailableContent = {})//Text(text = "Permission Not Available")})
@@ -180,10 +179,10 @@ fun CenteredText(text : String){
 fun TemperatureUI(temp:Temperature){
     Card() {
         CenteredText(text = "Temperature")
-        CenteredText("Overall Temperature:${temp.temp}")
-        CenteredText("Min:${temp.temp_min}")
-        CenteredText("Max:${temp.temp_max}")
-        CenteredText("FeelsLike:${temp.feels_like}")
+        CenteredText("Overall Temperature:${temp.displayTemp()}")
+        CenteredText("Min:${temp.displayMin()}")
+        CenteredText("Max:${temp.displayMax()}")
+        CenteredText("FeelsLike:${temp.displayFeelsLike()}")
     }
 }
 
