@@ -9,6 +9,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Granularity
 import com.google.android.gms.location.LocationCallback
@@ -79,15 +84,24 @@ fun getUserLocationNonComp(context: Context, callb:(latLon:LatandLong)->Unit) {
         locationCallback = object : LocationCallback() {
             @SuppressLint("MissingPermission")
             override fun onLocationResult(result: LocationResult) {
+                var updateCount = 0
                 locationProvider.lastLocation
                     .addOnSuccessListener { location ->
                         Log.d("addOnSuccessListener", "Location Received Success ${location}")
+                        updateCount++
                         location?.let {
                             val lat = location.latitude
                             val long = location.longitude
-                            callb(LatandLong(latitude = lat.toString(), longitude = long.toString()))
-                            locationProvider.removeLocationUpdates(locationCallback)
+                            if(updateCount ==1) { //Update only once.
+                                callb(
+                                    LatandLong(
+                                        latitude = lat.toString(),
+                                        longitude = long.toString()
+                                    )
+                                )
+                            }
                         }
+                        locationProvider.removeLocationUpdates(locationCallback)
                     }.addOnFailureListener {
                         Log.e("Location_error", "${it.message}")
                     }
@@ -95,9 +109,10 @@ fun getUserLocationNonComp(context: Context, callb:(latLon:LatandLong)->Unit) {
         }
     locationCallback.let {
         val locationRequest: LocationRequest =
-            LocationRequest.Builder(TimeUnit.MINUTES.toMillis(60000))
-                .setMaxUpdateDelayMillis(TimeUnit.MINUTES.toMillis(2000))
-                .setIntervalMillis(TimeUnit.MINUTES.toMillis(5000))
+            LocationRequest.Builder(60000)
+                .setMaxUpdateDelayMillis(60000)
+                .setIntervalMillis(50000)
+                .setDurationMillis(10)
                 .setPriority(Priority.PRIORITY_LOW_POWER)
                 .setMaxUpdates(1)
                 .setGranularity(Granularity.GRANULARITY_COARSE)
@@ -110,3 +125,4 @@ fun getUserLocationNonComp(context: Context, callb:(latLon:LatandLong)->Unit) {
         )
     }
 }
+

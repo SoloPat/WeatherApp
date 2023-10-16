@@ -65,6 +65,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
+    //Data store
+    implementation ("androidx.datastore:datastore-preferences:1.1.0-alpha05")
+
 
     //Location - Play Services
     implementation("com.google.android.gms:play-services-location:21.0.1")

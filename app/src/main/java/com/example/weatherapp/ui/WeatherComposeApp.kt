@@ -31,16 +31,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.weatherapp.data.model.Temperature
@@ -49,6 +53,8 @@ import com.example.weatherapp.data.model.WeatherDescription
 import com.example.weatherapp.util.LatandLong
 import com.example.weatherapp.util.PermiChecker
 import com.example.weatherapp.util.PermissionChecker
+import com.example.weatherapp.util.WeatherDataStore
+import com.example.weatherapp.util.WeatherDataStore.Companion.weatherDataStore
 import com.example.weatherapp.util.getUserLocation
 import com.example.weatherapp.util.getUserLocationNonComp
 import com.example.weatherapp.viewmodel.WeatherViewModel
@@ -59,6 +65,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionsRequired
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.collect
 
 
 @Composable
@@ -67,13 +74,21 @@ fun WeatherComposeApp() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
+    ExperimentalComposeUiApi::class
+)
 @Composable
 fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
 
     val viewState by weatherViewModel.viewState.collectAsState()
 
     val searchText by  weatherViewModel.searchText.collectAsState()
+    val context = LocalContext.current
+    val dataStore = remember {
+        WeatherDataStore(context)
+    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val lastSearch = dataStore.lastLocationFlow.collectAsState(initial = "")
 
     val permissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -83,17 +98,24 @@ fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
     )
 
     LaunchedEffect(key1 = Unit){
+        if(lastSearch.value.isNotEmpty() || lastSearch.value.isNotBlank()) {
+            weatherViewModel.searchTextUpdate(lastSearch.value)
+            weatherViewModel.getWeather(city = lastSearch.value)
+        }
         permissionsState.launchMultiplePermissionRequest()
     }
 
     PermiChecker(permissionsState,
         grantedContent = {
-            Text(text = "Permission Granted")
+            //Text(text = "Permission Granted")
             getUserLocationNonComp(LocalContext.current) {
                 weatherViewModel.getWeatherByCurrentLocation(lat = it.latitude, lon = it.longitude)
             } },
-        notGrantedContent = {Text(text = "Permission Not Granted")},
-        notAvailableContent = {Text(text = "Permission Not Available")})
+        notGrantedContent = {
+            //Text(text = "Permission Not Granted Last Location ${dataStore.lastLocationFlow}")
+            weatherViewModel.getWeather(city = lastSearch.value)
+                            },
+        notAvailableContent = {})//Text(text = "Permission Not Available")})
 
     Column (Modifier.padding(5.dp)){
         Row(
@@ -102,11 +124,14 @@ fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
             verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(modifier = Modifier
                 .weight(2f)
-                .padding(10.dp), value = searchText,
-                label = { Text(text = "E.g. New York, NY,USA")},
+                .padding(10.dp),
+                value = searchText,
+                label = { Text(text = "E.g. New York")},
                 onValueChange = { weatherViewModel.searchTextUpdate(it) },
                 leadingIcon = { Icon( imageVector = Icons.Default.Search, contentDescription = "search icon" )})
+
             Button(onClick = {
+                keyboardController?.hide()
                 weatherViewModel.getWeather(city = searchText)
                              },
                 modifier = Modifier

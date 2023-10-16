@@ -53,22 +53,6 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         }
 
     }
-
-
-    /*fun getLatLongFromCityName(cityName: String): Pair<Double, Double>? {
-        val geocoder = Geocoder(application.applicationContext)
-        try {
-            val addresses = geocoder.getFromLocationName(cityName, 1)
-            if (addresses.isNotEmpty()) {
-                val latitude = addresses[0].latitude
-                val longitude = addresses[0].longitude
-                return Pair(latitude, longitude)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return null
-    }*/
 }
 
 data class ViewState(val weather:Weather? = null,
