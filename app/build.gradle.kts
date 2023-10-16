@@ -66,6 +66,9 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
 
+    //Location - Play Services
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
     //Gson
     implementation("com.google.code.gson:gson:2.8.9")
     //Coil
@@ -80,6 +83,8 @@ dependencies {
     kapt ("com.google.dagger:hilt-compiler:2.48")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
 
+    //Accompanist
+    implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
 
 
     //Retrofit

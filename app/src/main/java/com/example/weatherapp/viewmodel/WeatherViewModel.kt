@@ -1,5 +1,6 @@
 package com.example.weatherapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.datasource.Result
@@ -24,10 +25,19 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         _searchText.value = searchText
     }
 
-    fun getWeather(city : String){
+    /**
+     * This function should be called only after getting the necessary permissions
+     */
+    fun getWeatherByCurrentLocation(lat:String = "", lon:String = ""){
+        Log.d("WeatherViewModel","getWeatherByCurrentLocation Lat ${lat} Lon${lon}")
+        //Get Location and call this function
+        getWeather(lat, lon, "")
+    }
+
+    fun getWeather(lat: String = "",lon:String = "", city : String){
         viewModelScope.launch{
             _viewState.update { it.copy(isLoading = true) }
-            val result : Result<Weather> = repository.getWeather(city)
+            val result : Result<Weather> = repository.getWeather(lat=lat, lon = lon, city = city)
             when(result){
                 is Result.Success -> {
                     println("GEt weather onSuccess ${result.data}")
@@ -38,7 +48,6 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
                     //_viewState.update { it.copy(error = result.message?:"Error when loading Weather", isLoading = false) }
                     _viewState.update { it.copy(error = result, isLoading = false) }
                 }
-
                 else -> {}
             }
         }

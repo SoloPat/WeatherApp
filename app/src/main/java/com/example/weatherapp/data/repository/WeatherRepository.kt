@@ -7,6 +7,6 @@ import javax.inject.Inject
 
 class WeatherRepository @Inject constructor(private val datasource: WeatherDatasource) {
     suspend fun getWeather(city : String,lat : String = "", lon : String=""):Result<Weather>{
-        return datasource.getWeather(city, lat, lon)
+        return datasource.getWeather(city = city, lat=lat, lon=lon)
     }
 }

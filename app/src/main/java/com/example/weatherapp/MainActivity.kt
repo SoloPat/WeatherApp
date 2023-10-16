@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val requestPermissionLauncher =
+        /*val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
                 if (isGranted) {
                     //Show the compose UI
@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
             }
-        }
+        }*/
         setContent {
             WeatherAppTheme(darkTheme = false) {
                 // A surface container using the 'background' color from the theme

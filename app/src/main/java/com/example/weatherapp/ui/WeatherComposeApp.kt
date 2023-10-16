@@ -1,5 +1,6 @@
 package com.example.weatherapp.ui
 
+import android.Manifest
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,7 +22,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocal
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +46,18 @@ import coil.compose.AsyncImage
 import com.example.weatherapp.data.model.Temperature
 import com.example.weatherapp.data.model.Weather
 import com.example.weatherapp.data.model.WeatherDescription
+import com.example.weatherapp.util.LatandLong
+import com.example.weatherapp.util.PermiChecker
+import com.example.weatherapp.util.PermissionChecker
+import com.example.weatherapp.util.getUserLocation
+import com.example.weatherapp.util.getUserLocationNonComp
 import com.example.weatherapp.viewmodel.WeatherViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionRequired
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionsRequired
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.gson.Gson
 
 
@@ -49,14 +67,33 @@ fun WeatherComposeApp() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
-    //val weatherViewModel : WeatherViewModel = viewModel()
 
     val viewState by weatherViewModel.viewState.collectAsState()
 
     val searchText by  weatherViewModel.searchText.collectAsState()
+
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    )
+
+    LaunchedEffect(key1 = Unit){
+        permissionsState.launchMultiplePermissionRequest()
+    }
+
+    PermiChecker(permissionsState,
+        grantedContent = {
+            Text(text = "Permission Granted")
+            getUserLocationNonComp(LocalContext.current) {
+                weatherViewModel.getWeatherByCurrentLocation(lat = it.latitude, lon = it.longitude)
+            } },
+        notGrantedContent = {Text(text = "Permission Not Granted")},
+        notAvailableContent = {Text(text = "Permission Not Available")})
 
     Column (Modifier.padding(5.dp)){
         Row(
@@ -70,7 +107,7 @@ fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
                 onValueChange = { weatherViewModel.searchTextUpdate(it) },
                 leadingIcon = { Icon( imageVector = Icons.Default.Search, contentDescription = "search icon" )})
             Button(onClick = {
-                weatherViewModel.getWeather(searchText)
+                weatherViewModel.getWeather(city = searchText)
                              },
                 modifier = Modifier
                     .padding(10.dp)
@@ -130,6 +167,7 @@ fun CenteredText(text : String){
 
 
 
+
 @Composable
 fun TemperatureUI(temp:Temperature){
     Card() {
@@ -150,7 +188,10 @@ fun LoadingIndicator(isLoading : Boolean) {
         color = MaterialTheme.colorScheme.surfaceVariant
         //trackColor = MaterialTheme.colorScheme.secondary,
     )
+
 }
+
+
 
 
 @Preview
@@ -178,89 +219,3 @@ fun TemperaturePreview(){
     TemperatureUI(temp = temp)
 }
 
-private fun getWeather():Weather{
-
-    return Gson().fromJson("{\n" +
-            "  \"coord\": {\n" +
-            "    \"lon\": -72.7923,\n" +
-            "    \"lat\": 41.8968\n" +
-            "  },\n" +
-            "  \"weather\": [\n" +
-            "    {\n" +
-            "      \"id\": 803,\n" +
-            "      \"main\": \"Clouds\",\n" +
-            "      \"description\": \"broken clouds\",\n" +
-            "      \"icon\": \"04d\"\n" +
-            "    }\n" +
-            "  ],\n" +
-            "  \"base\": \"stations\",\n" +
-            "  \"main\": {\n" +
-            "    \"temp\": 284.34,\n" +
-            "    \"feels_like\": 283.39,\n" +
-            "    \"temp_min\": 282.7,\n" +
-            "    \"temp_max\": 286.07,\n" +
-            "    \"pressure\": 1007,\n" +
-            "    \"humidity\": 72\n" +
-            "  },\n" +
-            "  \"visibility\": 10000,\n" +
-            "  \"wind\": {\n" +
-            "    \"speed\": 3.09,\n" +
-            "    \"deg\": 200\n" +
-            "  },\n" +
-            "  \"clouds\": {\n" +
-            "    \"all\": 75\n" +
-            "  },\n" +
-            "  \"dt\": 1696861293,\n" +
-            "  \"sys\": {\n" +
-            "    \"type\": 2,\n" +
-            "    \"id\": 2009442,\n" +
-            "    \"country\": \"US\",\n" +
-            "    \"sunrise\": 1696848977,\n" +
-            "    \"sunset\": 1696890025\n" +
-            "  },\n" +
-            "  \"timezone\": -14400,\n" +
-            "  \"id\": 4831766,\n" +
-            "  \"name\": \"Tariffville\",\n" +
-            "  \"cod\": 200\n" +
-            "}", Weather::class.java)
-}
-
-/*var active by remember { mutableStateOf(true) }
-    val prevSearch = remember { mutableStateListOf("Test 124") }
-        SearchBar(query = text,
-            onQueryChange = {
-                active = true
-                text = it
-                println("onQueryChange Called Text = ${it}")
-                            },
-            onSearch = {
-                prevSearch.add(it)
-                println("On Search adding element to history = ${it} Current list=${prevSearch.joinToString { "" }}")
-                active = false
-                       },
-            active = true,
-            onActiveChange = { active = it },
-            placeholder = { Text(text = "Enter City")},
-            leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon") },
-            trailingIcon = {
-                Icon(imageVector = Icons.Default.Clear,
-                    contentDescription = "Clear Icon",
-                    modifier = Modifier.clickable {
-                        if(text.isNotEmpty()){
-                            text=""
-                        }else{
-                            active = false
-                        }
-                    })
-            }) {
-            prevSearch.forEach {
-                Row(modifier = Modifier.padding(10.dp)){
-                    Icon(imageVector = Icons.Default.Refresh,
-                        contentDescription = "History Icon")
-                    Text(text = it)
-                }
-            }
-
-            WeatherResultList()
-        }
-*/
