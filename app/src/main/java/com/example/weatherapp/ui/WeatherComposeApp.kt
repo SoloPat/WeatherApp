@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,16 +21,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -44,28 +39,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.weatherapp.data.model.Temperature
 import com.example.weatherapp.data.model.Weather
 import com.example.weatherapp.data.model.WeatherDescription
-import com.example.weatherapp.util.LatandLong
 import com.example.weatherapp.util.PermiChecker
-import com.example.weatherapp.util.PermissionChecker
 import com.example.weatherapp.util.WeatherDataStore
-import com.example.weatherapp.util.WeatherDataStore.Companion.weatherDataStore
-import com.example.weatherapp.util.getUserLocation
 import com.example.weatherapp.util.getUserLocationNonComp
 import com.example.weatherapp.viewmodel.WeatherViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.MultiplePermissionsState
-import com.google.accompanist.permissions.PermissionRequired
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.PermissionsRequired
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.gson.Gson
-import kotlinx.coroutines.flow.collect
 
 
 @Composable
@@ -144,7 +128,7 @@ fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
         Spacer(modifier = Modifier.height(16.dp))
         LoadingIndicator(isLoading = viewState.isLoading)
         Spacer(modifier = Modifier.height(16.dp))
-        if(!viewState.error.message.isNullOrEmpty() || viewState.weather?.name == null){
+        if(viewState.error.message.isNotEmpty() || viewState.weather?.name == null){
             Text(text = " Search Again!!! ${viewState.error.message}")
         }else {
             WeatherResultList(weatherState = viewState.weather)
@@ -166,7 +150,6 @@ fun CityName(cityName:String){
         .padding(5.dp)
         .fillMaxWidth(1f), style = TextStyle(fontSize = 24.sp), textAlign = TextAlign.Center)
 }
-fun Modifier.heading(size: Int) = this.then(Modifier.size(size.dp))
 
 @Composable
 fun WeatherUI(wd: WeatherDescription){
