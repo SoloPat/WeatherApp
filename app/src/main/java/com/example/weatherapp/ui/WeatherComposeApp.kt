@@ -74,11 +74,10 @@ fun MySearchBar(){
     }
     val keyboardController = LocalSoftwareKeyboardController.current
     val lastSearch = dataStore.lastLocationFlow.collectAsState("")
-
+    Log.d("MySearchBar","Last Searched String=${lastSearch}")
     val permissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
     )
 
@@ -94,13 +93,14 @@ fun MySearchBar(){
     }
 
     //Todo Permission checked checks for permission but does not get user location due to location getting
-    //Multiple updates and recomposition happening repeatedly.
     PermiChecker(permissionsState,
         grantedContent = {
+            LaunchedEffect(Unit){
+                getUserLocation(context) {
+                    weatherViewModel.getWeatherByCurrentLocation(lat = it.latitude, lon = it.longitude)
+                }
+            }
             Log.d("MySearchBar","PermiChecker GrantedContent Called")
-            /*getUserLocation(LocalContext.current) { //Todo Issue with get location being called multiple times
-                weatherViewModel.getWeatherByCurrentLocation(lat = it.latitude, lon = it.longitude)
-            }*/
         },
         notGrantedContent = {
             Log.d("MySearchBar","PermiChecker NOTGrantedContent Called")
