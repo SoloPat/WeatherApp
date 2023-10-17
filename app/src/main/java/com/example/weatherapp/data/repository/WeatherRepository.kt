@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class WeatherRepository @Inject constructor(private val datasource: WeatherDatasource, private val dataStore: WeatherDataStore) {
     suspend fun getWeather(city : String,lat : String = "", lon : String=""):Result<Weather>{
-        if(city.isNotEmpty() || city.isNotBlank()) {
+        if(city.isNotEmpty() && city.isNotBlank()) {
             dataStore.saveLastSearchedLocation(city)
         }
         return datasource.getWeather(city = city, lat=lat, lon=lon)

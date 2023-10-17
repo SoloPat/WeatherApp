@@ -26,7 +26,8 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
     }
 
     /**
-     * This function should be called only after getting the necessary permissions
+     * This function should be called only after getting the necessary permissions.
+     * This is used to get weather based on the current location using lat and lon.
      */
     fun getWeatherByCurrentLocation(lat:String = "", lon:String = ""){
         Log.d("WeatherViewModel","getWeatherByCurrentLocation Lat ${lat} Lon${lon}")
@@ -34,6 +35,9 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         getWeather(lat, lon, "")
     }
 
+    /**
+     * This function is used to get weather based on City or Lat and Long.
+     */
     fun getWeather(lat: String = "",lon:String = "", city : String){
         viewModelScope.launch{
             _viewState.update { it.copy(isLoading = true) }

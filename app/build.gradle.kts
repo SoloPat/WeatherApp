@@ -103,4 +103,9 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    //Mock
+    testImplementation ("io.mockk:mockk:1.13.5")
+    androidTestImplementation ("io.mockk:mockk-android:1.13.5")
+
 }

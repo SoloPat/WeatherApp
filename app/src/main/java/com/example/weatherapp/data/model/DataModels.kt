@@ -1,7 +1,5 @@
 package com.example.weatherapp.data.model
 
-import java.math.RoundingMode
-import java.text.DecimalFormat
 
 data class Weather(val weather: List<WeatherDescription>, val main:Temperature, val name:String)
 
@@ -25,11 +23,8 @@ data class Temperature(val temp:Float=0.0f,
         return convert(temp_max)
     }
     fun convert(value: Float): String {
-        val fahrenheitValue = ((value - 273.15) * (9.0/5)) + 32.0
-        val df = DecimalFormat("#.##")
-        df.roundingMode = RoundingMode.DOWN
-        val convertedValue = df.format(fahrenheitValue)
-        return "$convertedValue °F"
+
+        return "$value°F"
     }
 }
 

@@ -25,7 +25,7 @@ class WeatherDataStore(private val context : Context) {
     }
 
     val lastLocationFlow : Flow<String> = context.weatherDataStore.data.map { prefs->
-        prefs[LAST_LOCATION_SEARCH]?: ""
+        prefs[LAST_LOCATION_SEARCH]?: "EMPTY Value"
     }
 }
 

@@ -1,6 +1,7 @@
 package com.example.weatherapp.ui
 
 import android.Manifest
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,12 +46,12 @@ import com.example.weatherapp.data.model.Weather
 import com.example.weatherapp.data.model.WeatherDescription
 import com.example.weatherapp.util.PermiChecker
 import com.example.weatherapp.util.WeatherDataStore
-import com.example.weatherapp.util.getUserLocationNonComp
+import com.example.weatherapp.util.getUserLocation
 import com.example.weatherapp.viewmodel.WeatherViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-
+//Entry point to the search screen
 @Composable
 fun WeatherComposeApp() {
     MySearchBar()
@@ -61,8 +62,9 @@ fun WeatherComposeApp() {
     ExperimentalComposeUiApi::class
 )
 @Composable
-fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
-
+fun MySearchBar(){
+    Log.d("MySearchBar","MySearchBarCalled")
+    val weatherViewModel: WeatherViewModel = viewModel()
     val viewState by weatherViewModel.viewState.collectAsState()
 
     val searchText by  weatherViewModel.searchText.collectAsState()
@@ -71,7 +73,7 @@ fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
         WeatherDataStore(context)
     }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val lastSearch = dataStore.lastLocationFlow.collectAsState(initial = "")
+    val lastSearch = dataStore.lastLocationFlow.collectAsState("")
 
     val permissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -80,24 +82,31 @@ fun MySearchBar(weatherViewModel: WeatherViewModel = viewModel()){
         )
     )
 
-    LaunchedEffect(key1 = Unit){
-        if(lastSearch.value.isNotEmpty() || lastSearch.value.isNotBlank()) {
-            weatherViewModel.searchTextUpdate(lastSearch.value)
-            weatherViewModel.getWeather(city = lastSearch.value)
+    LaunchedEffect(Unit){
+        Log.d("MySearchBar","LaunchedEffect Called")
+
+        lastSearch.value.let {
+            Log.d("MySearchBar","Updating search text from last search ${it}")
+            weatherViewModel.searchTextUpdate(it)
+            weatherViewModel.getWeather(city = it)
         }
         permissionsState.launchMultiplePermissionRequest()
     }
 
+    //Todo Permission checked checks for permission but does not get user location due to location getting
+    //Multiple updates and recomposition happening repeatedly.
     PermiChecker(permissionsState,
         grantedContent = {
-            Text(text = "Permission Granted")
-            getUserLocationNonComp(LocalContext.current) {
+            Log.d("MySearchBar","PermiChecker GrantedContent Called")
+            /*getUserLocation(LocalContext.current) { //Todo Issue with get location being called multiple times
                 weatherViewModel.getWeatherByCurrentLocation(lat = it.latitude, lon = it.longitude)
-            } },
+            }*/
+        },
         notGrantedContent = {
-            Text(text = "Permission Not Granted Last Location ${dataStore.lastLocationFlow}")
-            weatherViewModel.getWeather(city = lastSearch.value)
-                            },
+            Log.d("MySearchBar","PermiChecker NOTGrantedContent Called")
+            //Text(text = "Permission Not Granted Last Location ${dataStore.lastLocationFlow}")
+            weatherViewModel.getWeather(city = lastSearch.value) //Load last searched city if location permission is not granted
+        },
         notAvailableContent = {})//Text(text = "Permission Not Available")})
 
     Column (Modifier.padding(5.dp)){

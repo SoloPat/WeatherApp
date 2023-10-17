@@ -19,7 +19,8 @@ data class LatandLong(
 )
 
 @SuppressLint("MissingPermission")
-fun getUserLocationNonComp(context: Context, callb:(latLon:LatandLong)->Unit) {
+fun getUserLocation(context: Context, callb:(latLon:LatandLong)->Unit) {
+    Log.d("getUserLocation", "Method Called")
     lateinit var locationCallback: LocationCallback
     val locationProvider: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
