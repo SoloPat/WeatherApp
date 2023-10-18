@@ -3,7 +3,6 @@ package com.example.weatherapp.util
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.pm.PermissionInfo
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
@@ -14,6 +13,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+/**
+ * Permission checked without compose option. This is currently not used since accompanist was simpler.
+ * I just left this in case this could be needed in future.
+ */
 @Composable
 fun PermissionChecker(perm : List<String>,permissionGranted:(Boolean) ->Unit){
     if(permissionsGranted(LocalContext.current, perm)){
@@ -29,10 +32,10 @@ fun PermissionChecker(perm : List<String>,permissionGranted:(Boolean) ->Unit){
         //Show permission rationale dialog and on confirm ask for permissions
         val showRationaleFor = perm.filter { ActivityCompat.shouldShowRequestPermissionRationale(LocalContext.current as Activity, it) }
         if(showRationaleFor.isEmpty()){
-            launcher.launch(perm as Array<String>)
+            launcher.launch(perm.toTypedArray())
         }else{
         PermissionRationaleDialog(permissions =showRationaleFor,
-            onConfirm = { launcher.launch(perm as Array<String>) })
+            onConfirm = { launcher.launch(perm.toTypedArray()) })
         }
     }
 }

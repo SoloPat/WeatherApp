@@ -18,6 +18,12 @@ data class LatandLong(
     val longitude: String = ""
 )
 
+/**
+ * This function returns the user location using a call back when the location is retrieved.
+ * It is expected that this function will be called after permission check.
+ * Todo Remove the update count check as there has been multiple call backs. This could be a recomposition issue.
+ * The recomposition is fixed. Did not remove this check to avoid last minute changes.
+ */
 @SuppressLint("MissingPermission")
 fun getUserLocation(context: Context, callb:(latLon:LatandLong)->Unit) {
     Log.d("getUserLocation", "Method Called")
@@ -50,6 +56,7 @@ fun getUserLocation(context: Context, callb:(latLon:LatandLong)->Unit) {
                     }
             }
         }
+    //Todo these values are set to reduce the location permission updates. The values should be finetuned
     locationCallback.let {
         val locationRequest: LocationRequest =
             LocationRequest.Builder(60000)

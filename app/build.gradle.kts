@@ -108,4 +108,19 @@ dependencies {
     testImplementation ("io.mockk:mockk:1.13.5")
     androidTestImplementation ("io.mockk:mockk-android:1.13.5")
 
+    //Testing
+    testImplementation ("junit:junit:4.13.2")
+    androidTestImplementation ("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.4.0")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+
+    //Live Data Testing
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+
+    //View Model Testing
+    implementation ("androidx.lifecycle:lifecycle-viewmodel:2.3.1")
+
+    // Add dependencies for ViewModel and LiveData testing
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    testImplementation ("org.mockito:mockito-core:3.12.4")
 }

@@ -10,6 +10,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * This is the data store implementation for the app. Currently this only stores the last searched city.
+ * //todo If the data set is complex a room db is advisable. Since this is only a string using a simpler option
+ */
 class WeatherDataStore(private val context : Context) {
     companion object {
         val TAG : String ="WeatherDataStore"

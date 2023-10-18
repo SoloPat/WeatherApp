@@ -63,6 +63,10 @@ fun WeatherComposeApp() {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
     ExperimentalComposeUiApi::class
 )
+/**
+ * I have simplified the search bar. Initially I added a type ahead search bar which will search
+ * search for city upon typing using google places API. Due time constraints, I did not continue that approach.
+ */
 @Composable
 fun MySearchBar(){
     Log.d("MySearchBar","MySearchBarCalled")
@@ -94,7 +98,6 @@ fun MySearchBar(){
         permissionsState.launchMultiplePermissionRequest()
     }
 
-    //Todo Permission checked checks for permission but does not get user location due to location getting
     PermiChecker(permissionsState,
         grantedContent = {
             LaunchedEffect(Unit){
@@ -106,10 +109,9 @@ fun MySearchBar(){
         },
         notGrantedContent = {
             Log.d("MySearchBar","PermiChecker NOTGrantedContent Called")
-            //Text(text = "Permission Not Granted Last Location ${dataStore.lastLocationFlow}")
             weatherViewModel.getWeather(city = lastSearch.value) //Load last searched city if location permission is not granted
         },
-        notAvailableContent = {})//Text(text = "Permission Not Available")})
+        notAvailableContent = {})
 
     Column (Modifier.padding(5.dp)){
         Row(
@@ -165,11 +167,11 @@ fun CityName(cityName:String){
 fun WeatherUI(wd: WeatherDescription){
     Column {
         val request: ImageRequest = ImageRequest.Builder(LocalContext.current.applicationContext)
-            .data("https://openweathermap.org/img/wn/${wd.icon}@2x.png")
+            .data("https://openweathermap.org/img/wn/${wd.icon}@2x.png") //Todo This URL should be configurable
             .crossfade(true)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .networkCachePolicy(CachePolicy.ENABLED)
-            .diskCacheKey("${wd.icon}")
+            .diskCacheKey(wd.icon)
             .build()
 
         AsyncImage(model = request,
@@ -179,7 +181,7 @@ fun WeatherUI(wd: WeatherDescription){
             .width(120.dp)
             .fillMaxWidth(1f)
             .align(Alignment.CenterHorizontally),  contentDescription = "Weather icon")
-        CenteredText(text = "${wd.description}")
+        CenteredText(text = wd.description)
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
@@ -213,7 +215,6 @@ fun LoadingIndicator(isLoading : Boolean) {
     CircularProgressIndicator(
         modifier = Modifier.width(64.dp),
         color = MaterialTheme.colorScheme.surfaceVariant
-        //trackColor = MaterialTheme.colorScheme.secondary,
     )
 
 }

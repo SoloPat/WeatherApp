@@ -33,14 +33,16 @@ class WeatherDIModule {
         }.build()
     }
 
-
+    /**
+     * There is an option to create retrofit instance without the http client. I did not want to make changes at the last minute.
+     */
     @Provides
     @Singleton
     fun provideNetworkService(
         okHttpClient: OkHttpClient
     ): WeatherService {
         return Retrofit.Builder()
-            .baseUrl("https://api.openweathermap.org/")
+            .baseUrl("https://api.openweathermap.org/")//Todo This URL should be configurable in a config file
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()

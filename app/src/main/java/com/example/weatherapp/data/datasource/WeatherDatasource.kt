@@ -2,23 +2,25 @@ package com.example.weatherapp.data.datasource
 
 import com.example.weatherapp.data.model.Weather
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * This class uses Retrofit to get data from the weather api from network
+ */
 @Singleton
 class WeatherDatasource @Inject constructor(private val weatherService: WeatherService) {
 
+    /**
+     * This function returns weather data using city, lat and lon. If city is not valid the api
+     * returns an error. Both lat and lon should be present to get a successful result.
+     * //Todo Check if both lat and lon are not empty before making a network call
+     */
     suspend fun getWeather(city:String, lat : String, lon:String, ): Result<Weather> {
         val result:Result<Weather> = safeApiCall {
                 weatherService.getWeather(
-                    apiKey = "d2cafe90561172c46b817955bc2d1396",//Not a good practice to hardcode api key.
+                    apiKey = "d2cafe90561172c46b817955bc2d1396",//Todo Not a good practice to hardcode api key.
                     city=city,
                     lat = lat,
                     lon = lon
