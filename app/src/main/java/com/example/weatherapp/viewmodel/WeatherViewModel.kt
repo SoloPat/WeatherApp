@@ -1,5 +1,6 @@
 package com.example.weatherapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.datasource.Result
@@ -24,10 +25,23 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
         _searchText.value = searchText
     }
 
-    fun getWeather(city : String){
+    /**
+     * This function should be called only after getting the necessary permissions.
+     * This is used to get weather based on the current location using lat and lon.
+     */
+    fun getWeatherByCurrentLocation(lat:String = "", lon:String = ""){
+        Log.d("WeatherViewModel","getWeatherByCurrentLocation Lat ${lat} Lon${lon}")
+        //Get Location and call this function
+        getWeather(lat, lon, "")
+    }
+
+    /**
+     * This function is used to get weather based on City or Lat and Long.
+     */
+    fun getWeather(lat: String = "",lon:String = "", city : String){
         viewModelScope.launch{
             _viewState.update { it.copy(isLoading = true) }
-            val result : Result<Weather> = repository.getWeather(city)
+            val result : Result<Weather> = repository.getWeather(lat=lat, lon = lon, city = city)
             when(result){
                 is Result.Success -> {
                     println("GEt weather onSuccess ${result.data}")
@@ -38,28 +52,11 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
                     //_viewState.update { it.copy(error = result.message?:"Error when loading Weather", isLoading = false) }
                     _viewState.update { it.copy(error = result, isLoading = false) }
                 }
-
                 else -> {}
             }
         }
 
     }
-
-
-    /*fun getLatLongFromCityName(cityName: String): Pair<Double, Double>? {
-        val geocoder = Geocoder(application.applicationContext)
-        try {
-            val addresses = geocoder.getFromLocationName(cityName, 1)
-            if (addresses.isNotEmpty()) {
-                val latitude = addresses[0].latitude
-                val longitude = addresses[0].longitude
-                return Pair(latitude, longitude)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return null
-    }*/
 }
 
 data class ViewState(val weather:Weather? = null,

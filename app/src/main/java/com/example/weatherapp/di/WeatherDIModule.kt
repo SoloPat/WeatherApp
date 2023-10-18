@@ -1,11 +1,14 @@
 package com.example.weatherapp.di
 
+import android.content.Context
 import com.example.weatherapp.data.datasource.WeatherDatasource
 import com.example.weatherapp.data.datasource.WeatherService
 import com.example.weatherapp.data.repository.WeatherRepository
+import com.example.weatherapp.util.WeatherDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -30,14 +33,16 @@ class WeatherDIModule {
         }.build()
     }
 
-
+    /**
+     * There is an option to create retrofit instance without the http client. I did not want to make changes at the last minute.
+     */
     @Provides
     @Singleton
     fun provideNetworkService(
         okHttpClient: OkHttpClient
     ): WeatherService {
         return Retrofit.Builder()
-            .baseUrl("https://api.openweathermap.org/")
+            .baseUrl("https://api.openweathermap.org/")//Todo This URL should be configurable in a config file
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
@@ -52,7 +57,13 @@ class WeatherDIModule {
 
     @Provides
     @Singleton
-    fun provideRepository(dataSource: WeatherDatasource): WeatherRepository {
-        return WeatherRepository(dataSource)
+    fun provideRepository(dataSource: WeatherDatasource, dataStore: WeatherDataStore): WeatherRepository {
+        return WeatherRepository(dataSource, dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): WeatherDataStore {
+        return WeatherDataStore(context)
     }
 }
