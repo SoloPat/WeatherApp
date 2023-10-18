@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.weatherapp.data.model.Temperature
 import com.example.weatherapp.data.model.Weather
 import com.example.weatherapp.data.model.WeatherDescription
@@ -162,12 +164,21 @@ fun CityName(cityName:String){
 @Composable
 fun WeatherUI(wd: WeatherDescription){
     Column {
-        AsyncImage(modifier = Modifier
+        val request: ImageRequest = ImageRequest.Builder(LocalContext.current.applicationContext)
+            .data("https://openweathermap.org/img/wn/${wd.icon}@2x.png")
+            .crossfade(true)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .diskCacheKey("${wd.icon}")
+            .build()
+
+        AsyncImage(model = request,
+            modifier = Modifier
             .clip(CircleShape)
             .height(120.dp)
             .width(120.dp)
             .fillMaxWidth(1f)
-            .align(Alignment.CenterHorizontally), model="https://openweathermap.org/img/wn/${wd.icon}@2x.png", contentDescription = "Weather icon")
+            .align(Alignment.CenterHorizontally),  contentDescription = "Weather icon")
         CenteredText(text = "${wd.description}")
         Spacer(modifier = Modifier.height(24.dp))
     }
