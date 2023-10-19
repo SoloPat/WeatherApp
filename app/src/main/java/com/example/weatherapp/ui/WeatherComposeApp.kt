@@ -39,7 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -70,7 +71,7 @@ fun WeatherComposeApp() {
 @Composable
 fun MySearchBar(){
     Log.d("MySearchBar","MySearchBarCalled")
-    val weatherViewModel: WeatherViewModel = viewModel()
+    val weatherViewModel: WeatherViewModel = hiltViewModel()
     val viewState by weatherViewModel.viewState.collectAsState()
 
     val searchText by  weatherViewModel.searchText.collectAsState()
