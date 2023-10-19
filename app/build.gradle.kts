@@ -53,6 +53,9 @@ android {
 }
 
 dependencies {
+    val nav_version = "2.7.4"
+    val hilt_version = "2.48"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 
     implementation("androidx.core:core-ktx:1.9.0")//1.12.0
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -82,10 +85,10 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
     //Hilt
-    implementation ("com.google.dagger:hilt-android:2.48")
-    kapt ("com.google.dagger:hilt-compiler:2.48")
+    implementation ("com.google.dagger:hilt-android:${hilt_version}")
+    kapt ("com.google.dagger:hilt-compiler:${hilt_version}")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
-
+    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     //Accompanist
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
 
